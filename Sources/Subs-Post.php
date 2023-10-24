@@ -648,6 +648,12 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
 	$headers .= 'X-Mailer: SMF' . $line_break;
 
+	// If the message contains an unsubscribe link, also put that link in the headers.
+	if (preg_match('/' . preg_quote($scripturl) . '\?action=notify\S*;sa=off;\S*token=\S*/', $message, $matches))
+	{
+		$headers .= 'List-Unsubscribe: <' . iri_to_url($matches[0]) . '>' . $link_break;
+	}
+
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers, &$to_array)), true))
 		return false;
