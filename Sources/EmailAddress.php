@@ -153,8 +153,7 @@ class EmailAddress implements \Stringable
 		$this->domain_part = Utils::normalize($this->domain_part, 'kc_casefold');
 
 		// Get the Punycode encoded version of the domain.
-		// Checks for !empty() because idn_to_ascii() chokes on '0'.
-		$this->ascii_domain_part = !empty($this->domain_part) ? idn_to_ascii($this->domain_part) : $this->domain_part;
+		$this->ascii_domain_part = !empty($this->domain_part) ? (idn_to_ascii($this->domain_part) ?: $this->domain_part) : $this->domain_part;
 	}
 
 	/**
