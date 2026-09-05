@@ -733,6 +733,8 @@ class Register2 extends Register
 
 		$reg_options['register_vars']['spoofdetector_name'] = Utils::htmlspecialchars(SpoofDetector::getSkeletonString(html_entity_decode($reg_options['register_vars']['real_name'] ?? $reg_options['register_vars']['member_name'], ENT_QUOTES)));
 
+		$reg_options['register_vars']['email_address_ci'] = $reg_options['email']->casefolded();
+
 		$column_names = [];
 		$values = [];
 
