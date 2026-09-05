@@ -30,6 +30,7 @@ use SMF\Security;
 use SMF\TaskRunner;
 use SMF\Themes\default\MaintenanceTemplate;
 use SMF\Time;
+use SMF\Unicode\SpoofDetector;
 use SMF\Url;
 use SMF\User;
 use SMF\Utils;
@@ -1072,6 +1073,8 @@ class Install extends ToolsBase implements ToolsInterface
 						'secret_question' => 'string',
 						'additional_groups' => 'string',
 						'ignore_boards' => 'string',
+						'spoofdetector_name' => 'string',
+						'email_address_ci' => 'string',
 					],
 					[
 						[
@@ -1097,6 +1100,8 @@ class Install extends ToolsBase implements ToolsInterface
 							'',
 							'',
 							'',
+							Utils::htmlspecialchars(SpoofDetector::getSkeletonString(html_entity_decode($_POST['username'], ENT_QUOTES))),
+							$_POST['email']->casefolded(),
 						],
 					],
 					['id_member'],
