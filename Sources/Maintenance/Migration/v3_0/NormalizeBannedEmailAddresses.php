@@ -132,15 +132,15 @@ class NormalizeBannedEmailAddresses extends MigrationBase
 	 ******************/
 
 	/**
-	 * Gets the maximum value of id_member
+	 * Gets the maximum value of ban_items
 	 *
 	 * @return int
 	 */
 	private function getMax(): int
 	{
 		$request = $this->query(
-			'SELECT MAX(id_member)
-			FROM {db_prefix}members',
+			'SELECT MAX(id_ban)
+			FROM {db_prefix}ban_items',
 		);
 
 		$row = Db::$db->fetch_row($request);
