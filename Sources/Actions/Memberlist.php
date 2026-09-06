@@ -522,7 +522,7 @@ class Memberlist implements ActionInterface, Routable
 				$search_fields[] = 'email';
 
 				$email = new EmailAddress($_POST['search']);
-				$query_parameters['email_search'] = '%' . strtr(($email->local_part ?? '') . '@' . ($email->ascii_domain_part ?? ''), ['_' => '\\_', '%' => '\\%', '*' => '%']) . '%';
+				$query_parameters['email_search'] = '%' . strtr(Utils::convertCase($email->local_part, 'fold') . '@' . $email->ascii_domain_part, ['_' => '\\_', '%' => '\\%', '*' => '%']) . '%';
 			}
 
 			// These are expressions as well as plain columns, so they are
@@ -555,13 +555,10 @@ class Memberlist implements ActionInterface, Routable
 				ErrorHandler::fatalLang('invalid_search_string', false);
 			}
 
-			$query_ci = $_POST['search'] == '' ? ' = {empty}' : ' LIKE {string_ci:search}';
-			$query_cs = $_POST['search'] == '' ? ' = {empty}' : ' LIKE {string:search}';
-
 			$where = [];
 
 			foreach ($fields as $field) {
-				$where[] = $field . ($field === 'email_address_ci' ? $query_cs : $query_ci);
+				$where[] = $field . ($_POST['search'] == '' ? ' = {empty}' : ' LIKE {string:' . ($field === 'email_address_ci' ? 'email_search' : 'search') . '}');
 			}
 
 			$where = implode("\n\t\t\t\t\t\tOR ", $where);
