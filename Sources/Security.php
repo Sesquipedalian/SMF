@@ -574,9 +574,9 @@ class Security
 		}
 
 		// Is their email address banned?
-		$folded_email = EmailAddress::create($user->email)->casefolded();
+		$folded_email = EmailAddress::create($user->email ?? '')->casefolded();
 
-		if (\strlen($folded_email ?? '') > 0) {
+		if (\strlen($folded_email) > 0) {
 			$ban_query[] = '({string:email} LIKE bi.email_address)';
 			$ban_query_vars['email'] = $folded_email;
 		}
