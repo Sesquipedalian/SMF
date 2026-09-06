@@ -1105,9 +1105,9 @@ class Upgrade extends ToolsBase implements ToolsInterface
 			return true;
 		}
 
-		$substeps = [];
-
 		foreach (self::VERSION_MAP as $search => $ns) {
+			$substeps = [];
+
 			if (version_compare($this->start_smf_version, $search, '>')) {
 				continue;
 			}
@@ -1123,10 +1123,19 @@ class Upgrade extends ToolsBase implements ToolsInterface
 					exec: [$table, 'normalize'],
 				);
 			}
-		}
 
-		if (!$this->performSubsteps($substeps)) {
-			return false;
+			if (!$this->performSubsteps($substeps)) {
+				return false;
+			}
+
+			// Update Config::$modSettings['smfVersion'] incrementally as we go.
+			// This lets us avoid redoing unnecessary migration steps if the
+			// upgrader gets interrupted and restarted for some reason.
+			if (version_compare($search, SMF_VERSION, '<')) {
+				$this->updateModSettings([
+					'smfVersion' => substr($search, 0, strrpos($search, '.') + 1) . str_increment(substr($search, strrpos($search, '.') + 1)),
+				]);
+			}
 		}
 
 		return Sapi::isCLI();
