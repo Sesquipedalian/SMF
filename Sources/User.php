@@ -3828,8 +3828,10 @@ class User implements \ArrayAccess
 			),
 		);
 
+		$can_search_emails = self::$me->allowedTo('moderate_forum');
+
 		foreach ($names as $i => $name) {
-			if (str_contains($name, '@')) {
+			if ($can_search_emails && str_contains($name, '@')) {
 				$email = new EmailAddress($name, true);
 
 				// If it's a valid email, search for it as one.
