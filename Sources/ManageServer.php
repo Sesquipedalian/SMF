@@ -1836,35 +1836,25 @@ function registerSMStats()
 	if (!empty($modSettings['sm_stats_key']))
 		return true;
 
-	$fp = @fsockopen('www.simplemachines.org', 443, $errno, $errstr);
-	if (!$fp)
-		$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
-	if ($fp)
+	$data = fetch_web_data('https://www.simplemachines.org/smf/stats/register_stats.php?site=' . base64_encode($boardurl));
+
+	// Try one more time, this time without https.
+	if (empty($data)) {
+		$data = fetch_web_data('http://www.simplemachines.org/smf/stats/collect_stats.php?site=' . base64_encode($boardurl));
+	}
+
+	// Get the unique site ID.
+	preg_match('~SITE-ID:\s(\w{10})~', $data, $ID);
+
+	if (!empty($ID[1]))
 	{
-		$out = 'GET /smf/stats/register_stats.php?site=' . base64_encode($boardurl) . ' HTTP/1.1' . "\r\n";
-		$out .= 'Host: www.simplemachines.org' . "\r\n";
-		$out .= 'Connection: Close' . "\r\n\r\n";
-		fwrite($fp, $out);
-
-		$return_data = '';
-		while (!feof($fp))
-			$return_data .= fgets($fp, 128);
-
-		fclose($fp);
-
-		// Get the unique site ID.
-		preg_match('~SITE-ID:\s(\w{10})~', $return_data, $ID);
-
-		if (!empty($ID[1]))
-		{
-			$smcFunc['db_insert']('replace',
-				'{db_prefix}settings',
-				array('variable' => 'string', 'value' => 'string'),
-				array('sm_stats_key', $ID[1]),
-				array('variable')
-			);
-			return true;
-		}
+		$smcFunc['db_insert']('replace',
+			'{db_prefix}settings',
+			array('variable' => 'string', 'value' => 'string'),
+			array('sm_stats_key', $ID[1]),
+			array('variable')
+		);
+		return true;
 	}
 
 	return false;
