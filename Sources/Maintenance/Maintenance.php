@@ -896,11 +896,6 @@ class Maintenance
 			return;
 		}
 
-		// Only if there is one. Whether output is buffered at all depends on
-		// the server's output_buffering setting, and asking to discard a buffer
-		// that was never started raises a notice -- which is itself output, and
-		// so takes the header below with it and leaves the caller holding HTML
-		// where it expected JSON.
 		if (ob_get_level() > 0) {
 			ob_end_clean();
 		}
