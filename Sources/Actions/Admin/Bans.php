@@ -1903,8 +1903,9 @@ class Bans implements ActionInterface
 						$value = strtr($test->casefolded(), [md5('*') . '.com' => '*']);
 					}
 
-					// Replace POSIX wildcards with SQL wildcards.
-					$value = substr(strtr($value, ['*' => '%']), 0, 255);
+					// Escape literal SQL wildcard characters and replace POSIX
+					// wildcard characters with SQL wildcard characters.
+					$value = substr(strtr($value, ['_' => '\\_', '%' => '\\%', '*' => '%']), 0, 255);
 
 					// Check the user is not banning an admin.
 					$request = Db::$db->query(
